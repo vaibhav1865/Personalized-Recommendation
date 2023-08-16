@@ -131,13 +131,13 @@ from faker import Faker
 import random
 import datetime
 
-def genUserData():
+def genUserData(n):
     fake = Faker()
 
     # Generate user dataset
     user_dataset = []
 
-    for _ in range(5000):
+    for _ in range(n):
         user_id = fake.uuid4()
         # user_location = fake.city()
         user_location = random.choice([
@@ -165,7 +165,7 @@ def genUserData():
             'sign_up_date': sign_up_date
         })
 
-    with open('user_fake.csv', 'w') as user_file:
+    with open('user_fake.csv', 'w',newline='') as user_file:
         writer = csv.DictWriter(user_file , user_dataset[0].keys())
         writer.writeheader()
         writer.writerows(user_dataset)
@@ -187,29 +187,20 @@ def processCategory(categoryTree):
     return productCategoryTree
     
 
-# def processSpecifications(specifications):
-    # "{""product_specification""=>[{""key""=>""Number of Contents in Sales Package"", ""value""=>""Pack of 3""}, {""key""=>""Fabric"", ""value""=>""Cotton Lycra""}, {""key""=>""Type"", ""value""=>""Cycling Shorts""}, {""key""=>""Pattern"", ""value""=>""Solid""}, {""key""=>""Ideal For"", ""value""=>""Women's""}, {""value""=>""Gentle Machine Wash in Lukewarm Water, Do Not Bleach""}, {""key""=>""Style Code"", ""value""=>""ALTHT_3P_21""}, {""value""=>""3 shorts""}]}
-    # productSpecifications = json.loads(specifications)
-    
-    # for spec in productSpecifications["product_specification"]:
-    #     if "key" in spec:
-    #         spec["key"] = spec["key"].strip()
-    #     if "value" in spec:
-    #         spec["value"] = spec["value"].strip()
-    # return productSpecifications["product_specification"]
-
 
 def process(row):
 # uniq_id,crawl_timestamp,product_url,product_name,product_category_tree,pid,retail_price,discounted_price,image,is_FK_Advantage_product,description,product_rating,overall_rating,brand,product_specifications
 # c2d766ca982eca8304150849735ffef9,2016-03-25 22:59:23 +0000,http://www.flipkart.com/alisha-solid-women-s-cycling-shorts/p/itmeh2ffvzetthbb?pid=SRTEH2FF9KEDEFGF,Alisha Solid Women's Cycling Shorts,"[""Clothing >> Women's Clothing >> Lingerie, Sleep & Swimwear >> Shorts >> Alisha Shorts >> Alisha Solid Women's Cycling Shorts""]",SRTEH2FF9KEDEFGF,999,379,"[""http://img5a.flixcart.com/image/short/u/4/a/altht-3p-21-alisha-38-original-imaeh2d5vm5zbtgg.jpeg"", ""http://img5a.flixcart.com/image/short/p/j/z/altght4p-26-alisha-38-original-imaeh2d5kbufss6n.jpeg"", ""http://img5a.flixcart.com/image/short/p/j/z/altght4p-26-alisha-38-original-imaeh2d5npdybzyt.jpeg"", ""http://img5a.flixcart.com/image/short/z/j/7/altght-7-alisha-38-original-imaeh2d5jsz2ghd6.jpeg""]",false,"Key Features of Alisha Solid Women's Cycling Shorts Cotton Lycra Navy, Red, Navy,Specifications of Alisha Solid Women's Cycling Shorts Shorts Details Number of Contents in Sales Package Pack of 3 Fabric Cotton Lycra Type Cycling Shorts General Details Pattern Solid Ideal For Women's Fabric Care Gentle Machine Wash in Lukewarm Water, Do Not Bleach Additional Details Style Code ALTHT_3P_21 In the Box 3 shorts",No rating available,No rating available,Alisha,"{""product_specification""=>[{""key""=>""Number of Contents in Sales Package"", ""value""=>""Pack of 3""}, {""key""=>""Fabric"", ""value""=>""Cotton Lycra""}, {""key""=>""Type"", ""value""=>""Cycling Shorts""}, {""key""=>""Pattern"", ""value""=>""Solid""}, {""key""=>""Ideal For"", ""value""=>""Women's""}, {""value""=>""Gentle Machine Wash in Lukewarm Water, Do Not Bleach""}, {""key""=>""Style Code"", ""value""=>""ALTHT_3P_21""}, {""value""=>""3 shorts""}]}"
-    print(type(row))
+    # print(type(row))
+    # uniq_id	crawl_timestamp	product_url	product_name	product_category_tree	pid	retail_price	discounted_price	image	is_FK_Advantage_product	description	product_rating	overall_rating	brand	product_specifications
+
     newRow = []
-    uniqId = row[0]
+    # uniqId = row[0]
+    pid = row[5]
     crawlTimestamp = row[1]
     productUrl = row[2]
     productName = row[3]
     productCategoryTree = processCategory(row[4])
-    pid = row[5]
     retailPrice = row[6]
     discountedPrice = row[7]
     image = row[8]
@@ -220,7 +211,7 @@ def process(row):
     brand = row[13]
     # productSpecifications = processSpecifications(row[14])
     # print
-    newRow.append([uniqId , crawlTimestamp , productUrl , productName , productCategoryTree , pid , retailPrice , discountedPrice , image  , description , productRating  , brand ])
+    newRow.append([pid , crawlTimestamp , productUrl ,brand, productName , productCategoryTree  , retailPrice , discountedPrice , image  , description , productRating   ])
     return newRow
 
     # print( productCategoryTree[0] , len(productCategoryTree))
@@ -228,7 +219,7 @@ def process(row):
 
 
 
-def product_data():
+def product_data(n):
 # uniq_id,crawl_timestamp,product_url,product_name,product_category_tree,pid,retail_price,discounted_price,image,is_FK_Advantage_product,description,product_rating,overall_rating,brand,product_specifications
 # c2d766ca982eca8304150849735ffef9,2016-03-25 22:59:23 +0000,http://www.flipkart.com/alisha-solid-women-s-cycling-shorts/p/itmeh2ffvzetthbb?pid=SRTEH2FF9KEDEFGF,Alisha Solid Women's Cycling Shorts,"[""Clothing >> Women's Clothing >> Lingerie, Sleep & Swimwear >> Shorts >> Alisha Shorts >> Alisha Solid Women's Cycling Shorts""]",SRTEH2FF9KEDEFGF,999,379,"[""http://img5a.flixcart.com/image/short/u/4/a/altht-3p-21-alisha-38-original-imaeh2d5vm5zbtgg.jpeg"", ""http://img5a.flixcart.com/image/short/p/j/z/altght4p-26-alisha-38-original-imaeh2d5kbufss6n.jpeg"", ""http://img5a.flixcart.com/image/short/p/j/z/altght4p-26-alisha-38-original-imaeh2d5npdybzyt.jpeg"", ""http://img5a.flixcart.com/image/short/z/j/7/altght-7-alisha-38-original-imaeh2d5jsz2ghd6.jpeg""]",false,"Key Features of Alisha Solid Women's Cycling Shorts Cotton Lycra Navy, Red, Navy,Specifications of Alisha Solid Women's Cycling Shorts Shorts Details Number of Contents in Sales Package Pack of 3 Fabric Cotton Lycra Type Cycling Shorts General Details Pattern Solid Ideal For Women's Fabric Care Gentle Machine Wash in Lukewarm Water, Do Not Bleach Additional Details Style Code ALTHT_3P_21 In the Box 3 shorts",No rating available,No rating available,Alisha,"{""product_specification""=>[{""key""=>""Number of Contents in Sales Package"", ""value""=>""Pack of 3""}, {""key""=>""Fabric"", ""value""=>""Cotton Lycra""}, {""key""=>""Type"", ""value""=>""Cycling Shorts""}, {""key""=>""Pattern"", ""value""=>""Solid""}, {""key""=>""Ideal For"", ""value""=>""Women's""}, {""value""=>""Gentle Machine Wash in Lukewarm Water, Do Not Bleach""}, {""key""=>""Style Code"", ""value""=>""ALTHT_3P_21""}, {""value""=>""3 shorts""}]}"
 
@@ -238,32 +229,108 @@ def product_data():
         reader = csv.reader(f)
         next(reader)
         for row in reader:
-            # print(row)
-            print(i)
-            # if (i == 4):
-                # continue
-            # print(row)
-            # process(row)
-            # if( i == 3 ):
-            #     print( row[4] )
-            # else:
             newRow = process(row)
             i = i + 1
+            if i == n:
+                break
             productData.append(newRow)
     
     # print(productData[0])
     # print(len(productData))
-    with open('product.csv', 'w',encoding='utf-8') as f:
+    with open('product.csv', 'w',encoding='utf-8', newline='') as f:
         write = csv.writer(f)
         # write header
-        header = ["UID" , "CrawlTimestamp" , "ProductUrl" , "ProductName" , "ProductCategoryTree" , "PID" , "RetailPrice" , "DiscountedPrice" , "Image"  , "Description" , "ProductRating"  , "Brand" ]
+        # [pid , crawlTimestamp , productUrl ,brand, productName , productCategoryTree  , retailPrice , discountedPrice , image  , description , productRating 
+        header = ["PID" , "Timestamp" , "ProductUrl" , "Brand" , "ProductName" , "ProductCategoryTree" , "RetailPrice" , "DiscountedPrice" , "Image" , "Description" , "ProductRating"]
         write.writerow(header)
+        # i = 0
         for row in productData:
             write.writerows(row)
+
     
 
+def genTransData(n):
+    # for every user generate [4- 15] transactions such that each trancsaction record has
+    # tid , uid , pid , transactionAmount , TimeStamp  , transactionDevice
+    userData = []
+    with open('user_fake.csv', 'r',encoding='utf-8') as f:
+        reader = csv.reader(f)
+        next(reader)
+        for row in reader:
+            userData.append(row)
+    product_data = []
+    with open('product.csv', 'r',encoding='utf-8') as f:
+        reader = csv.reader(f)
+        next(reader)
+        for row in reader:
+            product_data.append(row)
+    
+    transcationData = []
+    for user in userData:
+        uid = user[0]
+        signUpdate = user[4]
+        noofTrans = random.randint(4,15)
+        products = random.sample(product_data , noofTrans)
+        for product in products:
+            pid = product[0]
+            transactionAmount = product[7]
+            transactionDate = random.choice([signUpdate , datetime.datetime.strptime(signUpdate, '%Y-%m-%d') + datetime.timedelta(days=random.randint(1, 365))])
+            transactionDate = str(transactionDate).split(" ")[0]
+            transactionTime = random.choice(["00:00:00" , "01:00:00" , "02:00:00" , "03:00:00" , "04:00:00" , "05:00:00" , "06:00:00" , "07:00:00" , "08:00:00" , "09:00:00" , "10:00:00" , "11:00:00" , "12:00:00" , "13:00:00" , "14:00:00" , "15:00:00" , "16:00:00" , "17:00:00" , "18:00:00" , "19:00:00" , "20:00:00" , "21:00:00" , "22:00:00" , "23:00:00"])
+            transactionTimeStamp = str(transactionDate) + " " + transactionTime
+            transactionDevice = random.choice(["Mobile" , "Laptop" , "Tablet" , "Desktop"])
+            transcationData.append([uid , pid , transactionAmount , transactionTimeStamp , transactionDevice])
+            
+    
+    with open('transaction.csv', 'w',encoding='utf-8', newline='') as f:
+        write = csv.writer(f)
+        # write header
+        header = ["UID" , "PID" , "TransactionAmount" , "TransactionTimeStamp" , "TransactionDevice"]
+        write.writerow(header)
+        write.writerows(transcationData)
 
 
+
+def genInteractionData(n):
+    # for every user generate [10 - 50] interactions such that each interaction record has
+    # uid , pid , stalk_time , wishtlisted , addCart-nobuy
+    userData = []
+    with open('user_fake.csv', 'r',encoding='utf-8') as f:
+        reader = csv.reader(f)
+        next(reader)
+        for row in reader:
+            userData.append(row)
+    product_data = []
+    with open('product.csv', 'r',encoding='utf-8') as f:
+        reader = csv.reader(f)
+        next(reader)
+        for row in reader:
+            product_data.append(row)
+    
+    interactionData = []
+    for user in userData:
+        uid = user[0]
+        signUpdate = user[4]
+        noofInteractions = random.randint(10,50)
+        products = random.sample(product_data , noofInteractions)
+        for product in products:
+            pid = product[0]
+            # stalk time in days:h:m:s
+            stalk_time_hrs = random.randint(0,23)
+            stalk_time_mins = random.randint(0,59)
+            stalk_time_secs = random.randint(0,59)
+            stalk_time = str(stalk_time_hrs) + ":" + str(stalk_time_mins) + ":" + str(stalk_time_secs)
+            wishtlisted = random.choice([True , False])
+            addCart_nobuy = random.choice([True , False])
+            interactionData.append([uid , pid , stalk_time , wishtlisted , addCart_nobuy])
+    
+    with open('interaction.csv', 'w',encoding='utf-8', newline='') as f:
+        write = csv.writer(f)
+        # write header
+        header = ["UID" , "PID" , "StalkTime" , "Wishtlisted" , "AddCart-nobuy"]
+        write.writerow(header)
+        write.writerows(interactionData)
+    
 
 #     with open('user.csv', 'w') as f:
 #         write = csv.writer(f)
@@ -277,8 +344,10 @@ def product_data():
 
 
 
-product_data()
+# product_data()
 
-    
-# genUserData()
+# product_data(10000)
+# genUserData(5000)
+# genTransData(10000)
 # generate_user_data()
+genInteractionData(10000)
