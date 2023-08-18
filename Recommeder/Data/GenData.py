@@ -310,7 +310,6 @@ def genInteractionData(n):
     interactionData = []
     for user in userData:
         uid = user[0]
-        signUpdate = user[4]
         noofInteractions = random.randint(10,50)
         products = random.sample(product_data , noofInteractions)
         for product in products:
@@ -332,19 +331,8 @@ def genInteractionData(n):
         write.writerows(interactionData)
     
 
-#     with open('user.csv', 'w') as f:
-#         write = csv.writer(f)
-#         # write header
-#         header = ["UID" , "Location" , "Gender" , "Age" , "SignupDate" , "LastActiveDate"]
-#         write.writerow(header)
-#         write.writerows(userData)
-
-    
 
 
-
-
-# product_data()
 
 # product_data(10000)
 # genUserData(5000)
