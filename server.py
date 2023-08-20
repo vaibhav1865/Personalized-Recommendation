@@ -6,6 +6,7 @@ import numpy as np
 from fastapi import FastAPI
 from gensim.models import Word2Vec
 
+import json
 
 
 
@@ -33,47 +34,48 @@ class Prod2VecRecommender():
         return self
 
 
+prod2vecRecom = pickle.load(open('prod2vec.pkl', 'rb'))
 
-def getreccomendation(userId , prod2vecRecom , new_transaction_table , pidToProductMetadata):
+
+
+new_transaction_table = pd.read_csv(r'.\Recommeder\Data\new_transaction_table.csv')
+for i in range(len(new_transaction_table)):
+    new_transaction_table['sequence'][i] = new_transaction_table['sequence'][i].replace("[","").replace("]","").replace("'","").split(", ")
+
+
+
+# userId = "2e112284-8013-430d-b784-8f1808dd4e76"
+
+# print("User ID: ", userId)
+pidToProductMetadata = json.load(open(r'.\Recommeder\Data\pidToProductMetadata.json', 'r'))
+# reccomdations = getreccomendation(userId , prod2vecRecom , new_transaction_table , pidToProductMetadata)
+
+def getreccomendation(userId ):
     reccomdations = []
+    
 
-    pastPurchases = new_transaction_table[new_transaction_table['UID'] == userId]['sequence'].values
+    pastPurchases = new_transaction_table[new_transaction_table['UID'] == userId]['sequence']
 
+    pastPurchases = pastPurchases.tolist()[0]
+    # print(pastPurchases , type(pastPurchases))
     reccomdations = prod2vecRecom.model.wv.most_similar(positive=pastPurchases[0], topn=10)
 
     reccomdation = []
     for i in reccomdations:
         reccomdation.append(pidToProductMetadata[i[0]])
 
-        
+
     return reccomdation
 
 
-# Load the model
-prod2vecRecom = pickle.load(open('prod2vec.pkl', 'rb'))
-# print vocab
+# print(reccomdations)
 
 
-# Load the data
-
-products = pd.read_csv(r'.\Recommeder\Data\flipkart_com-ecommerce_sample.csv')
-print(products.shape ,len(products['product_name'].unique()),len(products['uniq_id'].unique()))
-
-transactions_path = r".\Recommeder\Data\transaction.csv"
-transaction_table = pd.read_csv(transactions_path)
-
-pidToProductMetadata = {}
-for i in range(len(products)):
-    pidToProductMetadata[products['uniq_id'][i]] = [products['product_name'][i],products['description'][i],products['product_category_tree'][i],products['brand'][i],products['product_url'][i],products['image'][i]]
-pidToProductSeries = pd.Series(products['product_name'].values,index=products['uniq_id']).to_dict()
-
-new_transaction_table = pd.read_csv(r'.\Recommeder\Data\new_transaction_table.csv')
+app = FastAPI()
 
 
-# testing model
-userId = "2e112284-8013-430d-b784-8f1808dd4e76"
+@app.get("/reccomend/{userId}")
+def get_reccomendation(userId: str):
+    return getreccomendation(userId )
 
-print("User ID: ", userId)
 
-reccomdations = getreccomendation(userId , prod2vecRecom , new_transaction_table , pidToProductMetadata)
-print(reccomdations)
