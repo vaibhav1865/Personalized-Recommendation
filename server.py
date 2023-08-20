@@ -5,14 +5,16 @@ import numpy as np
 # import fastapi
 from fastapi import FastAPI
 from gensim.models import Word2Vec
+from sklearn.metrics.pairwise import cosine_similarity
+
 
 import json
 
 
+app = FastAPI()
 
 class Prod2VecRecommender():
     def __init__(self, min_count=2, size=100, window=5, decay_alpha=0.9, workers=4):
-
         super(Prod2VecRecommender, self).__init__()
         self.min_count = min_count
         self.size = size
@@ -44,13 +46,56 @@ for i in range(len(new_transaction_table)):
 
 
 
-# userId = "2e112284-8013-430d-b784-8f1808dd4e76"
+# wordsinVocab
+word2vecAllembeddings = pd.read_csv(r'.\Recommeder\Data\word2vecAllembeddings.csv')
 
 # print("User ID: ", userId)
 pidToProductMetadata = json.load(open(r'.\Recommeder\Data\pidToProductMetadata.json', 'r'))
-# reccomdations = getreccomendation(userId , prod2vecRecom , new_transaction_table , pidToProductMetadata)
 
-def getreccomendation(userId ):
+products = pd.read_csv(r'.\Recommeder\Data\products.csv')
+pidToidx = pd.Series(products.index,index=products['uniq_id']).drop_duplicates()
+
+
+
+def reccomendProductsw2vec(userId):
+
+    topk = 10
+    
+    pastPurchases = new_transaction_table[new_transaction_table['UID'] == userId]['sequence'].values
+
+    pastPurchasesIdx = []
+    for purchase in pastPurchases:
+        pastPurchasesIdx.append(pidToidx[purchase].to_list())
+    
+
+
+    product_embeddings = []
+    for idx in pastPurchasesIdx:
+        product_embeddings.append(word2vecAllembeddings.iloc[idx]['vector'])
+    
+    product_embeddings = np.array(product_embeddings)
+    avg_embeddings = np.mean(product_embeddings , axis=0)
+    similarity_scores = []
+    for idx , row in word2vecAllembeddings.iterrows():
+        score = cosine_similarity([avg_embeddings],[row['vector']])
+        similarity_scores.append((idx,score[0][0]))
+        
+    
+    similarity_scores = sorted(similarity_scores, key=lambda x: x[1], reverse=True)
+    product_names = []
+    last_score = 0
+    for i in similarity_scores:
+        if last_score == 0 or abs(last_score - i[1]) >= 0.01*last_score:
+            product_names.append(products.iloc[i[0]]['product_name'])
+            last_score = i[1]
+            if len(product_names) == topk:
+                break
+            
+        
+    return product_names
+
+
+def getreccomendationProd2vec(userId ):
     reccomdations = []
     
 
@@ -60,22 +105,34 @@ def getreccomendation(userId ):
     # print(pastPurchases , type(pastPurchases))
     reccomdations = prod2vecRecom.model.wv.most_similar(positive=pastPurchases[0], topn=10)
 
-    reccomdation = []
+    reccomdation = {}
     for i in reccomdations:
-        reccomdation.append(pidToProductMetadata[i[0]])
-
-
+        reccomdation[i[0]] = pidToProductMetadata[i[0]]
     return reccomdation
 
+
+
+
+
+
+userId = "2e112284-8013-430d-b784-8f1808dd4e76"
+
+# reccomdations = getreccomendation(userId  )
+
+# opjson = json.dumps(reccomdations)
+# with open("op.json", "w") as outfile:
+#     outfile.write(opjson)
 
 # print(reccomdations)
 
 
-app = FastAPI()
-
-
-@app.get("/reccomend/{userId}")
+@app.get("/Product2vec/{userId}")
 def get_reccomendation(userId: str):
-    return getreccomendation(userId )
+    return getreccomendationProd2vec(userId)
+
+@app.get("/Word2vec/{userId}")
+def getWord2reccomendation(userId: str):
+    return getWord2reccomendation(userId)
+
 
 
