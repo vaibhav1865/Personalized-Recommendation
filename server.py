@@ -6,6 +6,7 @@ import numpy as np
 from fastapi import FastAPI
 from gensim.models import Word2Vec
 from sklearn.metrics.pairwise import cosine_similarity
+import uvicorn
 
 
 import json
@@ -46,15 +47,18 @@ for i in range(len(new_transaction_table)):
 
 
 
-# wordsinVocab
-word2vecAllembeddings = pd.read_csv(r'.\Recommeder\Data\word2vecAllembeddings.csv')
+# # wordsinVocab
+# word2vecAllembeddings = pd.read_csv(r'.\embeddings.pkl')
+# read embeddings.pkl
+word2vecAllembeddings = pd.read_pickle('embeddings.pkl')
+
 
 # print("User ID: ", userId)
 pidToProductMetadata = json.load(open(r'.\Recommeder\Data\pidToProductMetadata.json', 'r'))
 
-products = pd.read_csv(r'.\Recommeder\Data\products.csv')
+products = pd.read_csv(r'.\Recommeder\Data\flipkart_com-ecommerce_sample.csv')
 pidToidx = pd.Series(products.index,index=products['uniq_id']).drop_duplicates()
-
+# pidToProductMetadata = 
 
 
 def reccomendProductsw2vec(userId):
@@ -116,6 +120,7 @@ def getreccomendationProd2vec(userId ):
 
 
 userId = "2e112284-8013-430d-b784-8f1808dd4e76"
+print(getreccomendationProd2vec(userId))
 
 # reccomdations = getreccomendation(userId  )
 
@@ -126,13 +131,19 @@ userId = "2e112284-8013-430d-b784-8f1808dd4e76"
 # print(reccomdations)
 
 
-@app.get("/Product2vec/{userId}")
-def get_reccomendation(userId: str):
-    return getreccomendationProd2vec(userId)
+# @app.get("/Product2vec/{userId}")
+# def get_reccomendation(userId: str):
+#     return getreccomendationProd2vec(userId)
 
-@app.get("/Word2vec/{userId}")
-def getWord2reccomendation(userId: str):
-    return getWord2reccomendation(userId)
+# @app.get("/Word2vec/{userId}")
+# def getWord2reccomendation(userId: str):
+#     return getWord2reccomendation(userId)
+
+
+
+# if __name__ == "__main__":
+#     uvicorn.run(app, host="0.0.0.0", port=8000)
+
 
 
 
